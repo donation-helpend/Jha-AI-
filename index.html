@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JHA AI - Personal AI Creator</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:#070707;
+  color:#fff;
+  min-height:100vh;
+}
+
+button,textarea{
+  font:inherit;
+}
+
+.app{
+  width:100%;
+  max-width:1100px;
+  margin:auto;
+  padding:18px;
+}
+
+header{
+  text-align:center;
+  padding:25px 0 20px;
+}
+
+.logo{
+  font-size:42px;
+  font-weight:900;
+  letter-spacing:2px;
+}
+
+.logo span{
+  color:#9b5cff;
+}
+
+.tagline{
+  color:#999;
+  margin-top:7px;
+  font-size:14px;
+}
+
+.main{
+  background:#101010;
+  border:1px solid #252525;
+  border-radius:22px;
+  padding:18px;
+}
+
+.label{
+  display:block;
+  margin-bottom:9px;
+  font-size:14px;
+  color:#bbb;
+}
+
+textarea{
+  width:100%;
+  min-height:155px;
+  resize:vertical;
+  background:#080808;
+  color:#fff;
+  border:1px solid #292929;
+  border-radius:15px;
+  padding:16px;
+  outline:none;
+}
+
+textarea:focus{
+  border-color:#8b5cf6;
+}
+
+textarea::placeholder{
+  color:#666;
+}
+
+.create{
+  width:100%;
+  margin-top:14px;
+  padding:15px;
+  border:0;
+  border-radius:13px;
+  background:linear-gradient(90deg,#6d28d9,#9b5cff);
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.create:active{
+  transform:scale(.99);
+}
+
+.quick{
+  margin-top:22px;
+}
+
+.quick-title{
+  font-size:14px;
+  color:#aaa;
+  margin-bottom:10px;
+}
+
+.buttons{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:9px;
+}
+
+.mode{
+  background:#171717;
+  color:#ddd;
+  border:1px solid #292929;
+  border-radius:11px;
+  padding:12px 7px;
+  cursor:pointer;
+}
+
+.mode.active{
+  background:#7c3aed;
+  border-color:#8b5cf6;
+  color:white;
+}
+
+#status{
+  display:none;
+  margin-top:18px;
+  padding:12px;
+  border-radius:10px;
+  background:#171717;
+  color:#aaa;
+  text-align:center;
+}
+
+.results{
+  margin-top:22px;
+  display:none;
+}
+
+.result-card{
+  background:#101010;
+  border:1px solid #292929;
+  border-radius:16px;
+  margin-bottom:13px;
+  overflow:hidden;
+}
+
+.card-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:13px 15px;
+  border-bottom:1px solid #252525;
+}
+
+.card-head strong{
+  font-size:15px;
+}
+
+.copy{
+  background:#222;
+  color:#fff;
+  border:1px solid #3a3a3a;
+  border-radius:8px;
+  padding:7px 10px;
+  cursor:pointer;
+}
+
+.card-body{
+  padding:15px;
+  white-space:pre-wrap;
+  line-height:1.6;
+  color:#ddd;
+  font-size:14px;
+}
+
+.notice{
+  margin-top:20px;
+  background:#111;
+  border:1px solid #252525;
+  border-radius:15px;
+  padding:15px;
+  color:#999;
+  font-size:13px;
+  line-height:1.6;
+}
+
+footer{
+  text-align:center;
+  color:#555;
+  font-size:12px;
+  padding:25px 0 10px;
+}
+
+@media(max-width:700px){
+  .buttons{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .logo{
+    font-size:34px;
+  }
+
+  .app{
+    padding:12px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+  <div class="logo">JHA <span>AI</span></div>
+  <div class="tagline">Your Personal AI Creator</div>
+</header>
+
+<section class="main">
+
+<label class="label">
+  Aap kya banana chahte ho?
+</label>
+
+<textarea id="prompt" placeholder="Example:
+
+Ek 1 minute ki horror story banao jisme ek ladka purane jungle mein kho jata hai. Story ke scenes, image prompts, video prompts, voice-over aur YouTube/Instagram package bhi do."></textarea>
+
+<button class="create" onclick="createContent()">
+  ✨ CREATE WITH JHA AI
+</button>
+
+<div class="quick">
+
+<div class="quick-title">Quick tools</div>
+
+<div class="buttons">
+
+<button class="mode active" onclick="setMode(this,'All-in-One')">🤖 All-in-One</button>
+
+<button class="mode" onclick="setMode(this,'Story')">📖 Story</button>
+
+<button class="mode" onclick="setMode(this,'Image')">🖼️ Text → Image</button>
+
+<button class="mode" onclick="setMode(this,'Video')">🎬 Text → Video</button>
+
+<button class="mode" onclick="setMode(this,'Scenes')">🎞️ Scenes</button>
+
+<button class="mode" onclick="setMode(this,'Instagram')">📸 Instagram</button>
+
+<button class="mode" onclick="setMode(this,'YouTube')">▶️ YouTube</button>
+
+<button class="mode" onclick="setMode(this,'Facebook')">📘 Facebook</button>
+
+<button class="mode" onclick="setMode(this,'Thumbnail')">🖼️ Thumbnail</button>
+
+<button class="mode" onclick="setMode(this,'SEO')">🔍 SEO</button>
+
+<button class="mode" onclick="setMode(this,'Script')">🎙️ Voice Script</button>
+
+<button class="mode" onclick="setMode(this,'Writer')">✍️ Writer</button>
+
+</div>
+</div>
+
+<div id="status"></div>
+
+</section>
+
+<section class="results" id="results"></section>
+
+<div class="notice">
+  <b>JHA AI Personal Creator</b><br>
+  Ye version JHA AI ka complete interface aur content workflow banata hai.
+  Real AI text/image/video generation ke liye baad mein compatible AI service/model connect karna hoga.
+</div>
+
+<footer>
+  JHA AI • Personal Creator
+</footer>
+
+</div>
+
+<script>
+
+let currentMode = "All-in-One";
+
+function setMode(button,mode){
+
+  currentMode = mode;
+
+  document.querySelectorAll(".mode").forEach(function(btn){
+    btn.classList.remove("active");
+  });
+
+  button.classList.add("active");
+}
+
+function escapeText(text){
+  return String(text || "").trim();
+}
+
+function addCard(title,text){
+
+  const results = document.getElementById("results");
+
+  const card = document.createElement("div");
+  card.className = "result-card";
+
+  const head = document.createElement("div");
+  head.className = "card-head";
+
+  const titleElement = document.createElement("strong");
+  titleElement.textContent = title;
+
+  const copy = document.createElement("button");
+  copy.className = "copy";
+  copy.textContent = "📋 Copy";
+
+  copy.onclick = function(){
+    navigator.clipboard.writeText(text).then(function(){
+      copy.textContent = "✅ Copied";
+      setTimeout(function(){
+        copy.textContent = "📋 Copy";
+      },1500);
+    });
+  };
+
+  head.appendChild(titleElement);
+  head.appendChild(copy);
+
+  const body = document.createElement("div");
+  body.className = "card-body";
+  body.textContent = text;
+
+  card.appendChild(head);
+  card.appendChild(body);
+
+  results.appendChild(card);
+}
+
+function createContent(){
+
+  const prompt = escapeText(
+    document.getElementById("prompt").value
+  );
+
+  if(!prompt){
+    alert("Pehle apna idea ya kaam likho bro.");
+    return;
+  }
+
+  const results = document.getElementById("results");
+  const status = document.getElementById("status");
+
+  results.innerHTML = "";
+  results.style.display = "block";
+
+  status.style.display = "block";
+  status.textContent = "JHA AI content package bana raha hai...";
+
+  setTimeout(function(){
+
+    status.style.display = "none";
+
+    if(currentMode === "All-in-One"){
+      generateAll(prompt);
+    }
+
+    else if(currentMode === "Story"){
+      generateStory(prompt);
+    }
+
+    else if(currentMode === "Image"){
+      generateImage(prompt);
+    }
+
+    else if(currentMode === "Video"){
+      generateVideo(prompt);
+    }
+
+    else if(currentMode === "Scenes"){
+      generateScenes(prompt);
+    }
+
+    else if(currentMode === "Instagram"){
+      generateInstagram(prompt);
+    }
+
+    else if(currentMode === "YouTube"){
+      generateYouTube(prompt);
+    }
+
+    else if(currentMode === "Facebook"){
+      generateFacebook(prompt);
+    }
+
+    else if(currentMode === "Thumbnail"){
+      generateThumbnail(prompt);
+    }
+
+    else if(currentMode === "SEO"){
+      generateSEO(prompt);
+    }
+
+    else if(currentMode === "Script"){
+      generateScript(prompt);
+    }
+
+    else if(currentMode === "Writer"){
+      generateWriter(prompt);
+    }
+
+    results.scrollIntoView({behavior:"smooth"});
+
+  },500);
+}
+
+
+function generateAll(prompt){
+
+  addCard(
+    "📖 STORY / MAIN CONTENT",
+`Create a complete story/content based on:
+
+${prompt}
+
+Structure:
+1. Strong opening hook
+2. Main character introduction
+3. Main situation/conflict
+4. Important events
+5. Climax
+6. Ending
+
+Keep the story engaging, clear and suitable for short-form content.`
+  );
+
+  addCard(
+    "🎞️ SCENE BREAKDOWN",
+`Scene 1:
+Opening and character introduction.
+
+Scene 2:
+The main situation begins.
+
+Scene 3:
+The problem becomes stronger.
+
+Scene 4:
+Major event / climax.
+
+Scene 5:
+Final reveal and ending.
+
+Topic:
+${prompt}
+
+Each scene should maintain consistent characters, location and visual style.`
+  );
+
+  addCard(
+    "🖼️ IMAGE PROMPTS",
+`SCENE 1 IMAGE:
+Cinematic realistic scene based on "${prompt}", main character clearly visible, consistent appearance, detailed environment, dramatic lighting, atmospheric mood, professional photography, vertical 9:16.
+
+SCENE 2 IMAGE:
+Continuation of the same story and characters, same clothing and appearance, cinematic environment, realistic details, dramatic lighting, vertical 9:16.
+
+SCENE 3 IMAGE:
+Continuation of the same story, consistent character design, emotional action, cinematic lighting, realistic environment, vertical 9:16.
+
+SCENE 4 IMAGE:
+Major climax of the story, same characters and visual identity, dramatic cinematic lighting, high detail, realistic atmosphere, vertical 9:16.
+
+SCENE 5 IMAGE:
+Final scene and ending, consistent characters, cinematic composition, emotional atmosphere, realistic details, vertical 9:16.`
+  );
+
+  addCard(
+    "🎬 VIDEO PROMPTS",
+`SCENE 1:
+Cinematic vertical video based on "${prompt}". Slow camera movement, establish the environment, introduce the main character, realistic lighting, natural motion, 9:16.
+
+SCENE 2:
+Continue the same story and character. Camera follows the character, subtle movement, cinematic lighting, realistic environment, 9:16.
+
+SCENE 3:
+Increase tension and movement. Same character appearance and location continuity, cinematic camera movement, atmospheric lighting, 9:16.
+
+SCENE 4:
+Climax scene with dynamic camera movement, dramatic lighting, realistic action, cinematic atmosphere, 9:16.
+
+SCENE 5:
+Final emotional shot, slow camera movement, cinematic lighting, realistic environment, 9:16.`
+  );
+
+  addCard(
+    "🎙️ VOICE-OVER SCRIPT",
+`[HOOK]
+Aaj ki kahani shuru hoti hai...
+
+[STORY]
+${prompt}
+
+[ENDING]
+Aur yahin se kahani ek unexpected turn leti hai.
+
+[CALL TO ACTION]
+Aisi aur stories ke liye follow/subscribe karein.`
+  );
+
+  addCard(
+    "📸 INSTAGRAM PACKAGE",
+`REEL TITLE:
+${prompt}
+
+HOOK:
+"Jo ab hone wala hai, uske liye koi ready nahi tha..."
+
+CAPTION:
+${prompt}
+
+HASHTAGS:
+#reels #story #viralreels #trending #explore #fyp #storytelling`
+  );
+
+  addCard(
+    "▶️ YOUTUBE PACKAGE",
+`TITLE:
+${prompt} | Complete Story
+
+DESCRIPTION:
+Aaj ki video mein ${prompt} ki complete story dekhiye.
+
+KEYWORDS:
+${prompt}, story, short story, viral story, storytelling, Hindi story
+
+HASHTAGS:
+#youtube #story #shorts #viral #trending`
+  );
+
+  addCard(
+    "🖼️ THUMBNAIL PROMPT",
+`Professional YouTube thumbnail based on "${prompt}", dramatic main subject, strong facial emotion, cinematic lighting, dark atmospheric background, high contrast, clear focal point, professional composition, attention grabbing, 16:9.`
+  );
+
+  addCard(
+    "🔍 SEO PACKAGE",
+`PRIMARY KEYWORD:
+${prompt}
+
+SEO TITLE:
+${prompt} | Complete Story
+
+META DESCRIPTION:
+Discover an engaging story based on ${prompt}, presented with cinematic storytelling and an emotional ending.
+
+KEYWORDS:
+${prompt}
+${prompt} story
+Hindi story
+viral story
+short story
+storytelling`
+  );
+}
+
+
+function generateStory(prompt){
+
+  addCard(
+    "📖 STORY",
+`Title:
+${prompt}
+
+Opening:
+Kahani ek aise moment se shuru hoti hai jahan sab kuch normal lag raha tha.
+
+Main Story:
+${prompt}
+
+Climax:
+Situation suddenly changes and the main character has to make an important decision.
+
+Ending:
+Kahani ek memorable ending ke saath complete hoti hai.`
+  );
+}
+
+
+function generateImage(prompt){
+
+  addCard(
+    "🖼️ TEXT → IMAGE PROMPT",
+`Create a high-quality cinematic image based on:
+
+"${prompt}"
+
+Visual style:
+Photorealistic, cinematic composition, detailed environment, realistic textures, dramatic lighting, natural shadows, atmospheric depth, professional photography.
+
+Composition:
+Clear main subject, strong focal point, balanced background.
+
+Aspect ratio:
+9:16 vertical.`
+  );
+}
+
+
+function generateVideo(prompt){
+
+  addCard(
+    "🎬 TEXT → VIDEO PROMPT",
+`Create a cinematic vertical video based on:
+
+"${prompt}"
+
+Camera:
+Smooth cinematic camera movement.
+
+Subject:
+Natural realistic movement.
+
+Lighting:
+Dramatic atmospheric lighting with realistic shadows.
+
+Environment:
+Detailed cinematic environment with depth.
+
+Style:
+Photorealistic, immersive, professional film look.
+
+Duration:
+Short-form video.
+
+Aspect ratio:
+9:16.`
+  );
+}
+
+
+function generateScenes(prompt){
+
+  addCard(
+    "🎞️ SCENE BREAKDOWN",
+`SCENE 1 — INTRODUCTION
+Introduce the world and main character.
+
+SCENE 2 — SETUP
+Show the situation and important details.
+
+SCENE 3 — CONFLICT
+Introduce the main problem.
+
+SCENE 4 — CLIMAX
+Show the biggest and most important moment.
+
+SCENE 5 — ENDING
+Resolve the story.
+
+STORY IDEA:
+${prompt}
+
+Keep character appearance, clothing, environment and visual style consistent between every scene.`
+  );
+}
+
+
+function generateInstagram(prompt){
+
+  addCard(
+    "📸 INSTAGRAM",
+`REEL IDEA:
+${prompt}
+
+HOOK:
+"Ruko... is story ka ending tum expect nahi karoge."
+
+CAPTION:
+${prompt}
+
+CTA:
+"Part 2 chahiye?"
+
+HASHTAGS:
+#reels #instagramreels #viral #trending #explore #fyp #story`
+  );
+}
+
+
+function generateYouTube(prompt){
+
+  addCard(
+    "▶️ YOUTUBE",
+`VIDEO IDEA:
+${prompt}
+
+TITLE:
+${prompt} | Full Story
+
+HOOK:
+"Video ke end tak ek important twist aane wala hai."
+
+DESCRIPTION:
+Aaj ki video mein ${prompt} ko interesting storytelling format mein present kiya gaya hai.
+
+TAGS:
+story, storytelling, hindi story, viral story, youtube shorts
+
+HASHTAGS:
+#youtube #shorts #story #viral`
+  );
+}
+
+
+function generateFacebook(prompt){
+
+  addCard(
+    "📘 FACEBOOK",
+`POST / REEL IDEA:
+${prompt}
+
+HOOK:
+"Ek minute ruk kar ye story zaroor dekho."
+
+CAPTION:
+${prompt}
+
+HASHTAGS:
+#facebook #reels #viral #story #trending`
+  );
+}
+
+
+function generateThumbnail(prompt){
+
+  addCard(
+    "🖼️ THUMBNAIL PROMPT",
+`Create a high-impact YouTube thumbnail about:
+
+"${prompt}"
+
+Use a dramatic cinematic scene, strong main subject, emotional expression, powerful lighting, high contrast, detailed background, professional creator thumbnail design, clear focal point, 16:9 aspect ratio.`
+  );
+}
+
+
+function generateSEO(prompt){
+
+  addCard(
+    "🔍 SEO",
+`PRIMARY KEYWORD:
+${prompt}
+
+SEO TITLE:
+${prompt} | Complete Guide
+
+META DESCRIPTION:
+Learn about ${prompt} with simple, useful and engaging information.
+
+RELATED KEYWORDS:
+${prompt} guide
+${prompt} tips
+${prompt} Hindi
+${prompt} tutorial
+${prompt} story
+
+HASHTAGS:
+#seo #content #trending #viral #creator`
+  );
+}
+
+
+function generateScript(prompt){
+
+  addCard(
+    "🎙️ VOICE-OVER SCRIPT",
+`HOOK:
+"Sunno... aaj ki story mein ek aisa twist hai jo aap expect nahi karoge."
+
+INTRO:
+Aaj hum baat karne wale hain ${prompt} ke baare mein.
+
+MAIN:
+${prompt}
+
+ENDING:
+Aur isi moment ne poori kahani badal di.
+
+CTA:
+Aisi aur stories ke liye follow aur subscribe karein.`
+  );
+}
+
+
+function generateWriter(prompt){
+
+  addCard(
+    "✍️ CONTENT WRITER",
+`TOPIC:
+${prompt}
+
+INTRODUCTION:
+${prompt} ek interesting topic hai jise simple aur engaging language mein explain kiya ja sakta hai.
+
+MAIN CONTENT:
+Topic ko clear sections mein divide karein, important points explain karein aur relevant examples add karein.
+
+CONCLUSION:
+Important information ko short summary ke saath conclude karein.`
+  );
+}
+
+</script>
+
+</body>
+  </html>
